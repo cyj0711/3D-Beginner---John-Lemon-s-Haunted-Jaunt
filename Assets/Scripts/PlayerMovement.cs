@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     public float turnSpeed = 20f; // 플레이어의 회전 속도(초당 회전하는 각도)
     Animator m_Animator;
     Rigidbody m_Rigidbody;
+    AudioSource m_AudioSource;
     Vector3 m_Movement;
     Quaternion m_Rotation = Quaternion.identity;
 
@@ -15,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     {
         m_Animator = GetComponent<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
+        m_AudioSource = GetComponent<AudioSource>();
     }
 
     // FixedUpdate()는 Update()와 달리 렌더링된 프레임에 맞춰 호출되는 것이 아니라 물리 시스템이 충돌 및 상호작용을 계산하기 전에 호출된다.
@@ -31,6 +33,19 @@ public class PlayerMovement : MonoBehaviour
         bool hasVerticalInput = !Mathf.Approximately(vertical, 0f);
         bool isWalking = hasHorizontalInput || hasVerticalInput;
         m_Animator.SetBool("IsWalking", isWalking);
+
+        // footstep sounds only played while walking
+        if (isWalking)
+        {
+            if(!m_AudioSource.isPlaying)
+            {
+                m_AudioSource.Play();
+            }
+        }
+        else
+        {
+            m_AudioSource.Stop();
+        }
 
         // 캐릭터의 전방벡터 계산
         Vector3 desiredForward = Vector3.RotateTowards(transform.forward, m_Movement, turnSpeed * Time.deltaTime, 0f);

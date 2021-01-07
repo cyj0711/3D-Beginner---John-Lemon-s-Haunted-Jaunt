@@ -9,13 +9,18 @@ public class GameEnding : MonoBehaviour
     public float displayImageDuration = 1f;
     public GameObject player;
     public CanvasGroup exitBackgroundImageCanvasGroup;
+    public AudioSource exitAudio;
     public CanvasGroup caughtBackgroundImageCanvasGroup;
+    public AudioSource caughtAudio;
 
     bool m_IsPlayerAtExit = false;
     bool m_IsPlayerCaught = false;
     float m_Timer = 0f;  // check the time duration for ending image fading
+    bool m_HasAudioPlayed = false;
 
-    void OnTriggerEnter(Collider other)
+   //  Player escape.
+
+   void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == player)
         {
@@ -23,6 +28,7 @@ public class GameEnding : MonoBehaviour
         }
     }
 
+   // Enemies catch the player.
     public void CaughtPlayer()
     {
         m_IsPlayerCaught = true;
@@ -32,16 +38,22 @@ public class GameEnding : MonoBehaviour
     {
         if (m_IsPlayerAtExit)
         {
-            EndLevel(exitBackgroundImageCanvasGroup, false);
+            EndLevel(exitBackgroundImageCanvasGroup, false, exitAudio);
         }
         else if (m_IsPlayerCaught)
         {
-            EndLevel(caughtBackgroundImageCanvasGroup, true);
+            EndLevel(caughtBackgroundImageCanvasGroup, true, caughtAudio);
         }
     }
 
-    void EndLevel(CanvasGroup imageCanvasGroup, bool doRestart)
+    void EndLevel(CanvasGroup imageCanvasGroup, bool doRestart, AudioSource audioSource)
     {
+        if(!m_HasAudioPlayed)
+        {
+            audioSource.Play();
+            m_HasAudioPlayed = true;
+        }
+
         m_Timer += Time.deltaTime;
         imageCanvasGroup.alpha = m_Timer / fadeDuration;    // fade image effect.
 
